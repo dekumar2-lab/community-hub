@@ -1,0 +1,17 @@
+backend:
+  name: github
+  repo: YOUR_USERNAME/community-hub # CHANGE THIS TO YOUR REPO NAME
+  branch: main
+  open_authoring: true # Allows public to suggest edits (PRs)
+
+media_folder: "assets"
+
+collections:
+  - name: "clusters"
+    label: "Residential Clusters"
+    folder: "clusters"
+    create: true
+    fields:
+      - {label: "Cluster Name", name: "title", widget: "string"}
+      - {label: "Last Updated", name: "last_updated", widget: "date"}
+      - {label: "Information Body", name: "body", widget: "markdown"}
