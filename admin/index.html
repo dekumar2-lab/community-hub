@@ -1,22 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Community Source of Truth</title>
+    <title>Community Hub Debug</title>
     <style>
-        body { font-family: -apple-system, sans-serif; padding: 40px; max-width: 800px; margin: auto; line-height: 1.6; }
-        .card { border: 1px solid #ddd; padding: 20px; border-radius: 8px; margin-top: 20px; background: #fafafa; }
-        .btn-add { background: #0969da; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold; }
-        .suggest-link { float: right; color: #0969da; font-weight: bold; text-decoration: none; }
-        .status-tag { font-size: 0.8em; color: #666; font-style: italic; }
+        body { font-family: sans-serif; padding: 40px; max-width: 800px; margin: auto; }
+        .error-box { background: #fee; border: 1px solid #f99; padding: 15px; color: #900; }
+        .card { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .btn { background: #007bff; color: white; padding: 10px; text-decoration: none; border-radius: 5px; }
     </style>
 </head>
 <body>
-    <h1>🏡 Community Information Hub</h1>
-    <p>Public "Source of Truth". To suggest a change, click the link on any card.</p>
+    <h1>🏡 Community Hub</h1>
     
-    <a href="https://github.com/dekumar2-lab/community-hub/issues/new?title=New+Area+Request&body=Please+add+details+about+the+new+area+here." class="btn-add">+ Propose New Area</a>
+    <div style="margin-bottom: 30px; padding: 20px; background: #f0f7ff; border-radius: 8px;">
+        <strong>Can't see your data?</strong><br>
+        <a href="https://github.com/dekumar2-lab/community-hub/issues/new" class="btn">Click Here to Propose a New Area</a>
+    </div>
 
-    <div id="directory">Loading community data...</div>
+    <div id="directory">Checking for data...</div>
 
     <script>
         const USER = 'dekumar2-lab';
@@ -25,25 +26,37 @@
         async function loadData() {
             const container = document.getElementById('directory');
             try {
+                console.log("Fetching from GitHub...");
                 const res = await fetch(`https://api.github.com/repos/${USER}/${REPO}/contents/clusters`);
-                const files = await res.json();
-                container.innerHTML = '';
+                
+                if (!res.ok) {
+                    throw new Error(`GitHub API returned ${res.status}. Do you have a folder named 'clusters'?`);
+                }
 
+                const files = await res.json();
+                console.log("Files found:", files);
+
+                if (files.length === 0) {
+                    container.innerHTML = "<p>The 'clusters' folder is empty.</p>";
+                    return;
+                }
+
+                container.innerHTML = '';
                 files.forEach(file => {
                     if(file.name.endsWith('.md')) {
                         const name = file.name.replace('.md', '').replace(/-/g, ' ');
                         const div = document.createElement('div');
                         div.className = 'card';
                         div.innerHTML = `
-                            <a href="https://github.com/dekumar2-lab/community-hub/issues/new?title=Update+Request:+${name}&body=Suggested+changes+for+${name}:" class="suggest-link">Suggest Edit</a>
                             <h3>${name.toUpperCase()}</h3>
-                            <span class="status-tag">Verified Source of Truth</span>
+                            <a href="https://github.com/${USER}/${REPO}/issues/new?title=Update+${name}">Suggest Edit</a>
                         `;
                         container.appendChild(div);
                     }
                 });
             } catch (e) {
-                container.innerHTML = '<p>No areas found. Use the blue button above to propose the first one!</p>';
+                console.error(e);
+                container.innerHTML = `<div class="error-box"><strong>Error:</strong> ${e.message}</div>`;
             }
         }
         loadData();
