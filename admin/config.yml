@@ -1,6 +1,6 @@
 backend:
   name: github
-  repo: YOUR_USERNAME/community-hub # CHANGE THIS TO YOUR REPO NAME
+  repo: dekumar2-lab/community-hub # CHANGE THIS TO YOUR REPO NAME
   branch: main
   open_authoring: true # Allows public to suggest edits (PRs)
 
