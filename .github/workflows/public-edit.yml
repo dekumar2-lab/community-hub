@@ -1,0 +1,27 @@
+name: Handle Public Edit
+on:
+  repository_dispatch:
+    types: [public-suggest-edit]
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create Branch and Commit
+        run: |
+          git checkout -b suggest-${{ github.event.client_payload.filename }}-${{ github.run_id }}
+          echo "${{ github.event.client_payload.content }}" > clusters/${{ github.event.client_payload.filename }}
+          git config user.name "Community Hub Bot"
+          git config user.email "bot@community.hub"
+          git add .
+          git commit -m "Public suggestion for ${{ github.event.client_payload.filename }}"
+          git push origin HEAD
+          
+      - name: Open Pull Request
+        uses: repo-sync/pull-request@v2
+        with:
+          source_branch: "" # Automatic from push
+          destination_branch: "master"
+          pr_title: "Suggestion: ${{ github.event.client_payload.filename }}"
+          github_token: ${{ secrets.GITHUB_TOKEN }}
