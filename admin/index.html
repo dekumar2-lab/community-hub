@@ -1,52 +1,52 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Residential Hub</title>
+    <title>Community Source of Truth</title>
     <style>
-        body { font-family: -apple-system, sans-serif; padding: 40px; max-width: 800px; margin: auto; }
-        .card { border: 1px solid #eee; padding: 20px; border-radius: 10px; margin-top: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .btn { background: #2ea44f; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; }
-        .edit-link { float: right; color: #0969da; text-decoration: none; font-size: 0.9em; }
+        body { font-family: -apple-system, sans-serif; padding: 40px; max-width: 800px; margin: auto; line-height: 1.6; }
+        .card { border: 1px solid #ddd; padding: 20px; border-radius: 8px; margin-top: 20px; background: #fafafa; }
+        .btn-add { background: #0969da; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold; }
+        .suggest-link { float: right; color: #0969da; font-weight: bold; text-decoration: none; }
+        .status-tag { font-size: 0.8em; color: #666; font-style: italic; }
     </style>
 </head>
 <body>
-    <h1>🏡 Community Source of Truth</h1>
-    <p>Structured, version-controlled information for our residents.</p>
+    <h1>🏡 Community Information Hub</h1>
+    <p>Public "Source of Truth". To suggest a change, click the link on any card.</p>
     
-    <a href="./admin/#/collections/clusters/new" class="btn">+ Add New Area</a>
+    <a href="https://github.com/dekumar2-lab/community-hub/issues/new?title=New+Area+Request&body=Please+add+details+about+the+new+area+here." class="btn-add">+ Propose New Area</a>
 
-    <div id="directory">Loading Clusters...</div>
+    <div id="directory">Loading community data...</div>
 
     <script>
-        // REPLACE THESE with your actual GitHub info
-        const USER = 'dekumar2-lab'; 
-        const REPO = 'community-hub'; 
+        const USER = 'dekumar2-lab';
+        const REPO = 'community-hub';
 
-        async function fetchClusters() {
+        async function loadData() {
             const container = document.getElementById('directory');
             try {
                 const res = await fetch(`https://api.github.com/repos/${USER}/${REPO}/contents/clusters`);
                 const files = await res.json();
                 container.innerHTML = '';
-                
+
                 files.forEach(file => {
                     if(file.name.endsWith('.md')) {
                         const name = file.name.replace('.md', '').replace(/-/g, ' ');
                         const div = document.createElement('div');
                         div.className = 'card';
                         div.innerHTML = `
-                            <a href="./admin/#/edit/clusters/${file.name.replace('.md', '')}" class="edit-link">Edit Info</a>
+                            <a href="https://github.com/dekumar2-lab/community-hub/issues/new?title=Update+Request:+${name}&body=Suggested+changes+for+${name}:" class="suggest-link">Suggest Edit</a>
                             <h3>${name.toUpperCase()}</h3>
-                            <p>Click edit to update information for this cluster.</p>
+                            <span class="status-tag">Verified Source of Truth</span>
                         `;
                         container.appendChild(div);
                     }
                 });
             } catch (e) {
-                container.innerHTML = 'Add your first cluster via the "Add New Area" button above.';
+                container.innerHTML = '<p>No areas found. Use the blue button above to propose the first one!</p>';
             }
         }
-        fetchClusters();
+        loadData();
     </script>
 </body>
 </html>
